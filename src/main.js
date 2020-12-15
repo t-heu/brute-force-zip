@@ -2,10 +2,10 @@ const {Open} = require('unzipper')
 const fs = require('fs')
 const path = require('path')
 
-const walkFile = path.join(__dirname, '..', 'zip', 'facil.zip')
+const walkFile = path.join(__dirname, '..', 'zip', 'hard.zip')
 
 async function decryptFile(password) {
-   try {
+  try {
     const directory = await Open.file(walkFile)
     const extracted = await directory.files[0].buffer(password)
     console.log(extracted.toString(), ' PASS: ' + password)
@@ -40,8 +40,13 @@ async function wordlists(name) {
 function allPossibleCombinations(input, length, curstr) {
   if(curstr.length == length) return [ curstr ];
   const ret = [];
+
   for(let i = 0; i < input.length; i++) {
-    ret.push.apply(ret, allPossibleCombinations(input, length, curstr + input[i]));
+    allPossibleCombinations(input, length, curstr + input[i])
+    if (curstr) {
+      decryptFile(curstr + input[i])
+    }
+    // ret.push.apply(ret, allPossibleCombinations(input, length, curstr + input[i]));
   }
   return ret;
 }
@@ -53,7 +58,7 @@ function generateLettersAndNumbers(t) {
   'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
   //console.log(allPossibleCombinations(alf, t, ''));
-  allPossibleCombinations(alf, t, '').forEach(combinations => decryptFile(combinations))
+  allPossibleCombinations(alf, t, '')// .forEach(combinations => decryptFile(combinations))
 }
 
 function execute(acc) {
@@ -67,7 +72,7 @@ function execute(acc) {
       wordlists('one.txt')
       break;
     case 3:
-      generateLettersAndNumbers(8)
+      generateLettersAndNumbers(4) // > 4
       break;
     default:
       console.log('nothing...')
